@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table de employe</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+
+        h2 {
+            margin-top: 20px;
+            padding: 10px;
+        }
+
+        table {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            width: 90%;
+            background-color: rgb(170, 169, 169);
+        }
+
+        th,
+        td {
+            text-align: center;
+            padding: 10px;
+            border: none;
+        }
+
+        th {
+            background-color: #343a40;
+            font-size: 1em;
+            color: white;
+        }
+
+        td {
+            background-color: white;
+            color: black;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            margin: 5px;
+        }
+
+        .back-button {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #34a4b0;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        .button,
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #34a4b0;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .btn-info {
+            background-color: #17a2b8;
+        }
+
+        .btn-info:hover {
+            background-color: #138496;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-warning {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .error-message {
+            max-width: 300px;
+            margin: 0 auto;
+            background-color: #ffcccc;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        label {
+            font-size: 16px;
+            font-weight: bold;
+            color: black;
+            background-color: #ff9900;
+            padding: 8px 10px;
+            border-radius: 5px;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        form {
+            width: 60%;
+            padding: 10px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 10px;
+            background-color: #343a40;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .header {
+            margin-bottom: 10px;
+        }
+    </style>
+    <script>
+        function showSection(sectionId) {
+            var sections = document.getElementsByClassName("form-section");
+            for (var i = 0; i < sections.length; i++) {
+                sections[i].style.display = "none";
+            }
+            document.getElementById(sectionId).style.display = "block";
+        }
+      </script>
+</head>
+
+<body>
+    <h2>Table de employe</h2>
+    <form method="get" action="">
+        <input type="text" id="query" name="query" placeholder="ID" required>
+    </form>
+    <a href="{% url 'menu_view' %}" class="back-button">Retour</a>
+    <div class="header">
+        <button onclick="showSection('current_employees')" class="button">employees</button>
+        <button onclick="showSection('archive')" class="button">archive</button>
+        
+        <a href="{% url 'pointage_mois_all' instances.0.unite_id  %}" class="button">all</a>
+    </div>
+    <div id="current_employees" class="form-section" style="display: block;">
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Last Name</th>
+                <th>Action</th>
+            </tr>
+            {% for instance in instances %}
+            {% if instance.active == 1 %}
+            <tr>
+                <td>{{ instance.id }}</td>
+                <td>{{ instance.name }}</td>
+                <td>{{ instance.last_name }}</td>
+                <td class="actions">
+                    {% if da < 3 %}
+                    <a href="{% url 'update_employe' instance.id %}" class="btn btn-info">Modifier</a>
+                    {% endif %}
+                    <a href="{% url 'mission' instance.id %}" class="btn btn-primary">Mission</a>
+                    <a href="{% url 'pointage_mois' instance.id %}" class="btn btn-primary">Pointage</a>
+    
+                    {% if da == 1 %}
+                    <a href="{% url 'synthese' instance.id %}" class="btn btn-primary" target="_blank">Fiche Synthese</a>
+                    <a href="{% url 'remboursement' instance.id %}" class="btn btn-warning">remboursement</a>
+    
+                    {% if instance.active == 1 %}
+                    <a href="{% url 'desactiver' instance.id %}" class="btn btn-danger">Deactivate</a>
+                    {% else %}
+                    <a href="{% url 'activer' instance.id %}" class="button">Activate</a>
+                    {% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </table>
+    </div>
+    <div id="archive" class="form-section" style="display: none;">
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Last Name</th>
+                <th>Action</th>
+            </tr>
+            {% for instance in instances %}
+            {% if instance.active != 1 %}
+            <tr>
+                <td>{{ instance.id }}</td>
+                <td>{{ instance.name }}</td>
+                <td>{{ instance.last_name }}</td>
+                <td class="actions">
+                    {% if da < 3 %}
+                    <a href="{% url 'update_employe' instance.id %}" class="btn btn-info">Modifier</a>
+                    {% endif %}
+                    <a href="{% url 'mission' instance.id %}" class="btn btn-primary">Mission</a>
+                    <a href="{% url 'pointage_mois' instance.id %}" class="btn btn-primary">Pointage</a>
+    
+                    {% if da == 1 %}
+                    <a href="{% url 'synthese' instance.id %}" class="btn btn-primary" target="_blank">Fiche Synthese</a>
+                    <a href="{% url 'remboursement' instance.id %}" class="btn btn-warning">remboursement</a>
+    
+                    {% if instance.active == 1 %}
+                    <a href="{% url 'desactiver' instance.id %}" class="btn btn-danger">Deactivate</a>
+                    {% else %}
+                    <a href="{% url 'activer' instance.id %}" class="button">Activate</a>
+                    {% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </table>
+    </div>
+</body>
+<script>
+    function search() {
+        // Get the input value
+        var query = document.getElementById('query').value.toLowerCase();
+        // Get all table rows
+        var rows = document.querySelectorAll('table tr');
+
+        // Loop through each row
+        for (var i = 1; i < rows.length; i++) { // Start from 1 to skip the header row
+            var id = rows[i].getElementsByTagName('td')[0].innerText.toLowerCase();
+            var name = rows[i].getElementsByTagName('td')[1].innerText.toLowerCase();
+            // Check if the query matches the ID or Name
+            if (id.includes(query) || name.includes(query)) {
+                rows[i].style.display = '';
+            } else {
+                rows[i].style.display = 'none'; // Hide the row if it doesn't match
+            }
+        }
+
+    }
+
+    // Add event listener to the input field
+    document.getElementById('query').addEventListener('input', search);
+
+    // Set the timeout duration in milliseconds (4 minutes)
+    const timeoutDuration = 240000;
+
+    // Function to logout the user
+    function logoutUser() {
+        var urlScheme = window.location.protocol;
+
+        // Get the hostname
+        var hostname = window.location.hostname;
+
+        // Get the port (if specified)
+        var port = window.location.port;
+        // Remove session data from cookies
+        document.cookie = "sessionid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        // Redirect to logout page or perform other logout actions
+        var logoutUrl = urlScheme + '//' + hostname;
+        if (port) {
+            logoutUrl += ':' + port;
+        }
+        logoutUrl += '/logout/';
+        console.log(logoutUrl)
+        // Redirect to the logout URL
+        window.location.href = logoutUrl; // Redirect to logout page
+    }
+
+    // Function to start the countdown timer
+    function startTimer() {
+        // Set the timeout for logout
+        setTimeout(logoutUser, timeoutDuration);
+    }
+
+    // Start the timer when the page is loaded or when the user performs an action
+    document.addEventListener('DOMContentLoaded', startTimer);
+    document.addEventListener('mousemove', startTimer); // Reset timer on mouse movement
+    document.addEventListener('keypress', startTimer); // Reset timer on keypress
+
+</script>
+
+</html>
+

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Employe</title>
+    
+
+    <style>
+        /* Define custom CSS for column layout */
+        .header{
+            display :flex;
+            justify-content: center;
+            gap: 40px;
+            align-items: center;
+        }
+        .form-section{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative; /* Ensure the pseudo-element is positioned relative to this div */
+            padding: 20px; /* Optional padding for visual clarity */
+            background-color: white; /* Background color for the main div */
+
+        }
+        .form-section-field {
+            text-align: center;
+            margin-bottom: 10px; /* Add spacing between fields */
+        }
+
+        .form-section  label {
+            display: block;
+            margin-bottom: 5px; /* Adjust spacing between label and input */
+        }
+        h2 {
+            color: #333; /* Dark grey heading color */
+            margin-bottom: 20px;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5; /* Light grey background */
+            
+        }
+        .submit-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px; /* Add some spacing above the submit button */
+            
+        }
+
+        /* Style the submit button */
+        button[type="submit"] {
+            padding: 10px 15px; /* Padding inside buttons */
+            background-color: #007bff; /* Button background color */
+            color: #fff; /* Button text color */
+            border: none; /* Remove button border */
+            border-radius: 4px; /* Rounded corners for buttons */
+            cursor: pointer; /* Pointer cursor on hover */
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3; /* Darker button background on hover */
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #34a4b0; /* Blue-green button color */
+            color: white; /* White text on button */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .back-button {
+            
+            padding: 10px;
+            background-color: #34a4b0;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        form p {
+            display: inline-block;
+            width: 250px;
+            margin-right: 10px; /* Optional: Add some margin between fields */
+        }
+
+        /* Set width of label elements */
+        form label {
+            width: 200px; /* Adjust width as needed */
+            display: inline-block;
+            text-align: left; /* Align label text to the right */
+        }
+
+        /* Set width of input elements */
+       
+
+      </style>
+      <script>
+        function showSection(sectionId) {
+            var sections = document.getElementsByClassName("form-section");
+            for (var i = 0; i < sections.length; i++) {
+                sections[i].style.display = "none";
+            }
+            document.getElementById(sectionId).style.display = "block";
+        }
+      </script>
+       <a href="{% url 'menu_view'  %}" class="back-button">Retour</a>
+</head>
+<body>
+    <div class="header">
+        <button onclick="showSection('personal-info')">Personal Info</button>
+        <button onclick="showSection('studies')">Studies</button>
+        <button onclick="showSection('family-situation')">Family Situation</button>
+    </div>
+
+    <form action="{% url 'update_employe' i.id %}" method="post">
+        {% csrf_token %}
+        
+        
+        <div id="personal-info" class="form-section" style="display: block;">
+        <!-- Personal Info Form Fields -->
+        {{form.as_p}}
+        <!-- Add more fields as needed -->
+        </div>
+          <!-- Column 2 -->
+        <div id="studies" class="form-section" style="display : none;">
+            {{ diplomes.management_form}}
+            {% for diplome in diplomes %}
+                {{diplome.as_p}}
+            {% endfor %}
+            <button type="button" id="add-diplome">Add Diplome</button>
+        </div>
+          <!-- Column 3 -->
+        <div id="family-situation" class="form-section" style="display: none;">
+            <h2>Partner</h2>
+            {{partner.as_p}}
+            <h1>child</h1>
+            {{ children.management_form}}
+                {% for child in children %}
+                    {{child.as_p}}
+                {% endfor %}
+            <button type="button" id="add-child">Add child</button>
+        </div>
+        <div  class="submit-container">
+            <button type="submit">Submit</button>
+        </div>
+    </form>
+</body>
+<script>
+    // Set the timeout duration in milliseconds (4 minutes)
+  const timeoutDuration = 240000;
+  
+  // Function to logout the user
+  function logoutUser() {
+    var urlScheme = window.location.protocol;
+
+    // Get the hostname
+    var hostname = window.location.hostname;
+
+    // Get the port (if specified)
+    var port = window.location.port;
+    // Remove session data from cookies
+    document.cookie = "sessionid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    // Redirect to logout page or perform other logout actions
+    var logoutUrl = urlScheme + '//' + hostname;
+    if (port) {
+        logoutUrl += ':' + port;
+    }
+    logoutUrl += '/logout/';
+    console.log(logoutUrl)
+    // Redirect to the logout URL
+    window.location.href = logoutUrl; // Redirect to logout page
+}
+  // Function to start the countdown timer
+  function startTimer() {
+      // Set the timeout for logout
+      setTimeout(logoutUser, timeoutDuration);
+  }
+  
+  // Start the timer when the page is loaded or when the user performs an action
+  document.addEventListener('DOMContentLoaded', startTimer);
+  document.addEventListener('mousemove', startTimer); // Reset timer on mouse movement
+  document.addEventListener('keypress', startTimer); // Reset timer on keypress
+  
+  </script>
+  <script>
+    document.getElementById('add-diplome').addEventListener('click', function() {
+    var formCount = document.querySelector('#studies.form-section').querySelector('#id_form-TOTAL_FORMS').value;
+    var newForm = document.createElement('div');
+    newForm.classList.add('form');
+    newForm.innerHTML = '{{ diplomes.empty_form.as_p|escapejs }}'.replace(/__prefix__/g, formCount);
+    var container = document.querySelector('#studies.form-section');
+    container.insertBefore(newForm, document.getElementById('add-diplome'));
+    document.querySelector('#studies.form-section').querySelector('#id_form-TOTAL_FORMS').value = parseInt(formCount) + 1;
+});
+document.getElementById('add-child').addEventListener('click', function() {
+    var formCount = document.querySelector('#family-situation.form-section').querySelector('#id_form-TOTAL_FORMS').value;
+    var newForm = document.createElement('div');
+    newForm.classList.add('form');
+    newForm.innerHTML = '{{ children.empty_form.as_p|escapejs }}'.replace(/__prefix__/g, formCount);
+    var container = document.querySelector('#family-situation.form-section');
+    container.insertBefore(newForm, document.getElementById('add-child'));
+    document.querySelector('#family-situation.form-section').querySelector('#id_form-TOTAL_FORMS').value = parseInt(formCount) + 1;
+});
+
+
+</script>
+</html>
+

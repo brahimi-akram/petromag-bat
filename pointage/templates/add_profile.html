@@ -1,0 +1,148 @@
+<!-- add_profile.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Profile</title>
+</head>
+<style>
+    body {
+            padding-top: 50px;
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa; /* Light gray background */
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: #fff; /* White background for form */
+            padding: 20px; /* Add padding to form container */
+            border-radius: 5px; /* Add rounded corners to form container */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add shadow to form container */
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        select, input[type="password"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .hidden {
+            display: none;
+        }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Add Profile</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="unite">Unite:</label>
+        <select id="unite" name="unite">
+            {% for unite in stations %}
+                <option value="{{ unite.id }}">{{ unite }}</option>
+            {% endfor %}
+        </select>
+        <label for="username">Employe:</label>
+        <select id="username" name="username">
+            <option value=" " disabled selected>__</option>
+            {% for i in instances %}
+                <option value="{{i.name}}-{{i.last_name}}" data-unite="{{i.unite_id}}">{{i}}</option>
+            {% endfor %}
+        </select>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password">
+        <label for="da">Access:</label>
+        <select id="da" name="da">
+            <option value=" " disabled selected>__</option>
+            <option value="1">add profile, change unites, fdp, correct errors, manage employe, pointage</option>
+            <option value="2">add+update employe, pointage</option>
+            <option value="3">pointage</option>
+        </select>
+        
+        <button type="submit">Submit</button>
+    </form>
+</div>
+</body>
+<script>
+    // Set the timeout duration in milliseconds (4 minutes)
+  const timeoutDuration = 240000;
+  
+  // Function to logout the user
+  function logoutUser() {
+    var urlScheme = window.location.protocol;
+
+    // Get the hostname
+    var hostname = window.location.hostname;
+
+    // Get the port (if specified)
+    var port = window.location.port;
+    // Remove session data from cookies
+    document.cookie = "sessionid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    // Redirect to logout page or perform other logout actions
+    var logoutUrl = urlScheme + '//' + hostname;
+    if (port) {
+        logoutUrl += ':' + port;
+    }
+    logoutUrl += '/logout/';
+    console.log(logoutUrl)
+    // Redirect to the logout URL
+    window.location.href = logoutUrl; // Redirect to logout page
+}
+  // Function to start the countdown timer
+  function startTimer() {
+      // Set the timeout for logout
+      setTimeout(logoutUser, timeoutDuration);
+  }
+  
+  // Start the timer when the page is loaded or when the user performs an action
+  document.addEventListener('DOMContentLoaded', startTimer);
+  document.addEventListener('mousemove', startTimer); // Reset timer on mouse movement
+  document.addEventListener('keypress', startTimer); // Reset timer on keypress
+  
+  document.addEventListener('DOMContentLoaded', function() {
+            var uniteSelect = document.getElementById('unite');
+            var usernameSelect = document.getElementById('username');
+
+            uniteSelect.addEventListener('change', function() {
+                var selectedUnit = this.value;
+                var options = usernameSelect.options;
+
+                for (var i = 0; i < options.length; i++) {
+                    var employeeUnit = options[i].getAttribute('data-unite');
+                    if (selectedUnit === employeeUnit) {
+                        options[i].classList.remove('hidden');
+                    } else {
+                        options[i].classList.add('hidden');
+                    }
+                }
+                usernameSelect.value = ''; // Reset the employee dropdown
+            });
+
+            // Trigger change event to filter employees on page load if a unit is selected
+            uniteSelect.dispatchEvent(new Event('change'));
+        });
+        
+  </script>
+</html>

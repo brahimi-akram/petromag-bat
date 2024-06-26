@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pointage</title>
+    <style>
+        /* Custom CSS for modern styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+    
+        header {
+            padding: 10px;
+            text-align: center;
+            font-size: 1.5em;
+        }
+    
+        table {
+            border-radius: 10px; /* Rounded corners for table */
+            overflow: hidden; /* Hide overflowing border radius */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Box shadow for table */
+            margin-bottom: 20px;
+        }
+    
+        th, td {
+            text-align: center;
+            padding: 10px;
+            border: none; /* Remove borders from all columns */
+            align-text: center;
+            width: 100px;
+        }
+    
+        th {
+            background-color: #343a40; /* Dark background color for table headers */
+            font-size: 1em;
+            color: white;
+        }
+    
+        .today {
+            background-color: #0056b3 !important;
+        }
+    
+        td {
+            background-color: white;
+            color: black;
+            font-size: 1.0em;
+        }
+    
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+    
+        .date-group {
+            display: flex;
+            flex-direction: row; /* Make them appear horizontally */
+            align-items: center;
+            margin-bottom: 5px; /* Add margin-bottom for spacing */
+        }
+    
+        .date-group label {
+            margin-right: 10px; /* Add margin-right to separate label and select */
+        }
+    
+        .date-group select {
+            height: 30px; /* Set a fixed height for the select box */
+            margin-left: 0; /* Remove margin-left to align the select box with the label */
+        }
+    
+        td.date-group {
+            height: 40px; /* Set a fixed height for the td.date-group element */
+        }
+    
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+    
+        .step-links a {
+            padding: 10px;
+            margin: 0 5px;
+            text-decoration: none;
+            color: #007BFF;
+            border: 1px solid #007BFF;
+            border-radius: 5px;
+        }
+    
+        .step-links .current {
+            padding: 10px;
+            margin: 0 5px;
+            background-color: #007BFF;
+            color: white;
+            border: 1px solid #007BFF;
+            border-radius: 5px;
+        }
+    
+        .back-button {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #34a4b0;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+    
+        .header {
+            margin-top: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+    
+        #query {
+            width: 350px; /* Make the search input field fill the entire width */
+            padding: 10px; /* Add padding for better appearance */
+            border: 1px solid #ccc; /* Add a border */
+            border-radius: 5px; /* Add some border radius for rounded corners */
+            box-sizing: border-box; /* Ensure padding and border are included in the width */
+            transition: border-color 0.3s; /* Add transition for border color change */
+        }
+    
+        .secondheader {
+        display: flex;
+        margin: 15px;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .secondheader button {
+        padding: 10px 20px;
+        margin: 0 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        background-color: #323232;
+        color: #fff;
+    }
+
+    .secondheader button:hover {
+        background-color: #0056b3;
+    }
+    
+        .desc {
+            width: 400px;
+        }
+    
+        .back-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 10px;
+            background-color: #343a40;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+    
+        a::hover {
+            text-decoration: none;
+        }
+    
+        tr.highlight td {
+            background-color: rgb(255, 153, 102);
+        }
+    
+        .hidden {
+            display: none;
+        }
+    
+        /* Add custom form styles */
+        .form-container {
+            background-color: #fff; /* White background for form */
+            padding: 20px; /* Add padding to form container */
+            border-radius: 5px; /* Add rounded corners to form container */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add shadow to form container */
+            margin-bottom: 20px; /* Add space below form container */
+            max-width: 500px; /* Set maximum width for form container */
+            display: flex; /* Use flexbox for layout */
+            flex-direction: column; /* Arrange form elements vertically */
+            align-items: center; /* Center form elements horizontally */
+        }
+    
+        .form-container h1 {
+            text-align: center; /* Center the heading */
+            margin-bottom: 30px; /* Add space below heading */
+        }
+    
+        .form-container label {
+            display: block; /* Display labels as block elements */
+            margin-bottom: 5px; /* Add space below each label */
+        }
+    
+        .form-container select,
+        .form-container input[type="password"] {
+            width: 100%; /* Make inputs fill the entire width of their container */
+        padding: 8px; /* Add padding to inputs */
+        margin-bottom: 15px; /* Add space below inputs */
+        border-radius: 5px; /* Add rounded corners to inputs */
+        border: 1px solid #ccc; /* Add border to inputs */
+        box-sizing: border-box; /* Ensure padding and border are included in the width */
+    }
+
+    .form-container button {
+        width: 100%; /* Make button fill the entire width of its container */
+        padding: 10px; /* Add padding to button */
+        background-color: #007bff; /* Default button background color */
+        color: #fff; /* Default button text color */
+        border: none; /* Remove button border */
+        border-radius: 5px; /* Add rounded corners to button */
+        cursor: pointer; /* Change cursor to pointer on hover */
+    }
+
+    .form-container button:hover {
+        background-color: #0056b3; /* Darker background color on hover */
+    }
+    .button-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    .button-container button {
+        padding: 10px 20px;
+        margin: 0 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .button-container button:hover {
+        background-color: #007BFF;
+        color: white;
+    }
+</style>
+</head>
+<body>
+    <div class="header">
+        <h1> Petromag </h1>
+        <h2> Unite : {{instances.0.unite}} </h2> 
+        <div class="secondheader">
+            <button onclick="toggleTables('employe')">employees</button>
+            <button onclick="toggleTables('employe_on_mission')">employees on mission</button>
+        </div>
+        <h3>{{ date|date:"Y-m-d" }}</h3> 
+        <a href="{% url 'menu_view' %}" class="back-button">Retour</a>
+    </div>
+    <div > 
+        
+        <input type="text" id="query" class="search" name="query"  placeholder="Search by Matricule or Name...">  
+            
+
+
+    </div>
+    <div class="table-responsive"> 
+        <table class="table">
+            <tr> 
+                <th>Matricule</th>
+                <th>Employe</th>
+                {% for d in date_range %}
+                {% if d == date %}
+                <th class="today"> {{d|date:"d"}}</th>
+                {% else %}
+                <th> {{d|date:"d"}}  </th>
+                {% endif %}
+                {% endfor %}
+            </tr>
+                <form  id="form" method="POST" >
+                    {% csrf_token %}
+                    <tbody id="employe" class="hidden">
+                        {% for i in instances %}
+                        {% if i.active == 1 and i.special != 2 %}
+                        <tr {% if i in overwork %} class="highlight" {%endif%}  >
+                            <td>{{ i.id }}</td>   
+                            <td>{{ i.name }} {{ i.last_name }}</td> 
+                            {% for id, list in res.items %}
+                                {% if id == i.id %}
+                                    {% for date, result in list.items %}
+                                        {% if result.is_editable or result.open_to_edit  %}
+                                            <td> 
+                                                <select  id="{{ i.id }}_{{ date }}" name="{{ i.id }}_{{ date }}" {% if i in employe_to_disable %} disabled {% endif %}>
+                                                    {% comment %} <option value="">-</option> {% endcomment %}
+                                                    <option value="{{ result.code.ID }}" selected>{{ result.code.ID }}</option>
+                                                    {% for code in codes %}
+                                                        <option value="{{ code.ID }}">{{ code.ID }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </td>
+                                    
+                                    
+                                        {% elif result.code.ID != null  %}
+                                            {% if result.date == today %}
+                                            <td> 
+                                                <select  id="{{ i.id }}_{{ date }}" name="{{ i.id }}_{{ date }}" class="specific-select"  disabled >
+                                                
+                                                    <option value="{{ result.code.ID }}" selected>{{ result.code.ID }}</option>
+                                                    {% for code in codes %}
+                                                        <option value="{{ code.ID }}">{{ code.ID }}</option>
+                                                    {% endfor %}
+                                                </select>
+        
+                                            </td>
+                                            
+                                            {% else %}
+                                            <td> <div>{{ result.code.ID }}</div></td>
+                                            {% endif %}
+                                            
+                                        {% else %}
+                                            <td> 
+                                                <select id="{{ i.id }}_{{ date }}" name="{{ i.id }}_{{ date }}" {% if i in employe_to_disable %} disabled {% endif %} >
+                                                        <option value="">-</option>
+                                                        {% for code in codes %}
+                                                            <option value="{{ code.ID }}">{{ code.ID }}</option>
+                                                        {% endfor %}
+                                                </select>
+                                            </td>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            {% endfor %}
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                    <tbody id="employe_on_mission" class="hidden">
+                        {% for i in employe_on_mission %}
+                        <tr {% if i in overwork %} class="highlight" {%endif%}>
+                            <td>{{ i.id }}</td>   
+                            <td>{{ i.name }} {{ i.last_name }}</td> 
+                            {% for id, list in res2.items %}
+                                {% if id == i.id %}
+                                    {% for date, result in list.items %}
+                                        {% if result.is_editable or result.open_to_edit  %}
+                                            <td> 
+                                                <select  id="{{ i.id }}_{{ date }}" name="{{ i.id }}_{{ date }}">
+                                                    {% comment %} <option value="">-</option> {% endcomment %}
+                                                    <option value="{{ result.code.ID }}" selected>{{ result.code.ID }}</option>
+                                                    {% for code in codes %}
+                                                        <option value="{{ code.ID }}">{{ code.ID }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </td>
+                                    
+                                    
+                                        {% elif result.code.ID != null  %}
+                                            {% if result.date == today %}
+                                            <td> 
+                                                <select  id="{{ i.id }}_{{ date }}" name="{{ i.id }}_{{ date }}" class="specific-select"  disabled >
+                                                
+                                                    <option value="{{ result.code.ID }}" selected>{{ result.code.ID }}</option>
+                                                    {% for code in codes %}
+                                                        <option value="{{ code.ID }}">{{ code.ID }}</option>
+                                                    {% endfor %}
+                                                </select>
+        
+                                            </td>
+                                            
+                                            {% else %}
+                                            <td> <div>{{ result.code.ID }}</div></td>
+                                            {% endif %}
+                                            
+                                        {% else %}
+                                            <td> 
+                                                <select id="{{ i.id }}_{{ date }}" name="{{ i.id }}_{{ date }}">
+                                                        <option value="">-</option>
+                                                        {% for code in codes %}
+                                                            <option value="{{ code.ID }}">{{ code.ID }}</option>
+                                                        {% endfor %}
+                                                </select>
+                                            </td>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            {% endfor %}
+                            <td><input type="checkbox" name="{{i.id}}_valid" id="{{i.id}}_valid">valid</td>
+                        </tr>
+                        
+                        {% endfor %}
+                        
+                    </tbody>
+                    <div class="secondheader"> 
+                        <button type="submit"  id="submitButton" class="btn btn-success"> Sauvgarder </button>    
+                        <button type="button" id="modifyBtn" class="btn btn-secondary mx-3" > Modifier </button>
+    
+                    </div>
+                
+    
+                </form>
+
+        </table>
+
+    </div>
+    
+    <table>
+        <tr>
+            <th>Code</th>
+            <th>descripton</th>
+        </tr>
+        {% for code in codes %}
+        <tr>
+            <td>{{code.ID}}</td>
+            <td class="desc">{{code.Description}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    {% comment %} <a href="{% url 'menu_view' %}" class="back-button">Retour</a>    {% endcomment %}
+</body>
+
+<script>
+    document.getElementById('modifyBtn').addEventListener('click', function() {
+        console.log("nice")
+        // Get the specific select elements you want to modify
+        var selectElements = document.querySelectorAll('.specific-select');
+        // Loop through each select element
+        selectElements.forEach(function(select) {
+            // Toggle the disabled attribute
+            select.disabled = !select.disabled;
+        });
+    });
+    // Function to handle the search functionality
+    function search() {
+        // Get the input value
+        var query = document.getElementById('query').value.toLowerCase();
+        // Get all table rows
+        var rows = document.querySelectorAll('table tr');
+
+        // Loop through each row
+        for (var i = 1; i < rows.length; i++) { // Start from 1 to skip the header row
+            var id = rows[i].getElementsByTagName('td')[0].innerText.toLowerCase();
+            var name = rows[i].getElementsByTagName('td')[1].innerText.toLowerCase();
+            // Check if the query matches the ID or Name
+            if (id.includes(query) || name.includes(query)) {
+                rows[i].style.display = '';
+            } else {
+                rows[i].style.display = 'none'; // Hide the row if it doesn't match
+            }
+        }
+        
+    }
+    
+    // Add event listener to the input field
+    document.getElementById('query').addEventListener('input', search);
+    
+     document.getElementById('form').addEventListener('submit', function() {
+     
+       
+
+    // Disable the submit button to prevent multiple submissions
+        submitButton.disabled = true;
+    // Optional: Reload the current tab
+    });
+      // Set the timeout duration in milliseconds (4 minutes)
+const timeoutDuration = 240000;
+
+// Function to logout the user
+function logoutUser() {
+    var urlScheme = window.location.protocol;
+
+    // Get the hostname
+    var hostname = window.location.hostname;
+
+    // Get the port (if specified)
+    var port = window.location.port;
+    // Remove session data from cookies
+    document.cookie = "sessionid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    // Redirect to logout page or perform other logout actions
+    var logoutUrl = urlScheme + '//' + hostname;
+    if (port) {
+        logoutUrl += ':' + port;
+    }
+    logoutUrl += '/logout/';
+    console.log(logoutUrl)
+    // Redirect to the logout URL
+    window.location.href = logoutUrl; // Redirect to logout page
+}
+
+// Function to start the countdown timer
+function startTimer() {
+    // Set the timeout for logout
+    setTimeout(logoutUser, timeoutDuration);
+}
+
+// Start the timer when the page is loaded or when the user performs an action
+document.addEventListener('DOMContentLoaded', startTimer);
+document.addEventListener('mousemove', startTimer); // Reset timer on mouse movement
+document.addEventListener('keypress', startTimer); // Reset timer on keypress
+
+function toggleTables(tableId) {
+            document.getElementById('employe').classList.add('hidden');
+            document.getElementById('employe_on_mission').classList.add('hidden');
+            document.getElementById(tableId).classList.remove('hidden');
+        }
+
+        // Initial display setup
+        document.getElementById('employe').classList.remove('hidden');
+
+</script>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 40px 50px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #555;
+            font-size: 18px;
+        }
+        input[type="date"],
+        select {
+            padding: 15px;
+            margin-bottom: 25px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 18px;
+            flex: 1;
+        }
+        .unit-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .add-button {
+            padding: 0 15px;
+            margin-left: 10px;
+            margin-bottom: 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 18px;
+            cursor: pointer;
+            height: 50px;
+        }
+        .add-button:hover {
+            background-color: #0056b3;
+        }
+        .remove-button {
+            padding: 0 15px;
+            margin-left: 10px;
+            margin-bottom: 20px;
+            background-color: #ff0033;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 18px;
+            cursor: pointer;
+            height: 50px;
+        }
+        .remove-button:hover {
+            background-color: #b80019;
+        }
+        button[type="submit"] {
+            padding: 15px 20px;
+            background-color: #44c7ff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        button[type="submit"]:hover {
+            background-color: #1ca8ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Mission {{employe}}</h1>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <label for="start_date">Select a date : </label>
+            <input type="date" id="start_date" name="start_date" required>
+
+            <div id="units">
+                <div class="unit-container" id="unit-container-0">
+                    <label for="unite">Select a unit:</label>
+                    <select id="unite" name="unite" required>
+                        {% for unit in unites %}
+                            <option value="{{ unit.id }}">{{ unit }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="button" class="add-button" onclick="addUnit()">+</button>
+                </div>
+            </div>
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        let unitCounter = 1;
+
+        function addUnit() {
+            const unitsDiv = document.getElementById('units');
+            const newUnitDiv = document.createElement('div');
+            newUnitDiv.classList.add('unit-container');
+            newUnitDiv.setAttribute('id', `unit-container-${unitCounter}`);
+            newUnitDiv.innerHTML = `
+                <label for="unite_${unitCounter}">Select a unit: </label>
+                <select id="unite_${unitCounter}" name="unite_${unitCounter}" required>
+                    <option value='' disabled selected>___</option>
+                    {% for unit in unites %}
+                        <option value="{{ unit.id }}">{{ unit }}</option>
+                    {% endfor %}
+                </select>
+                <button type="button" class="remove-button" onclick="removeUnite(${unitCounter})">x</button>
+            `;
+            unitsDiv.appendChild(newUnitDiv);
+            unitCounter++;
+        }
+        function removeUnite(unitId){
+            const unitDiv= document.getElementById(`unit-container-${unitId}`);
+            if (unitDiv){
+                unitDiv.remove();
+            }
+            unitCounter--;
+            
+        }
+    </script>
+</body>
+</html>

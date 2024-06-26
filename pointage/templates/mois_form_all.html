@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Month Selection Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5; /* Light grey background */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh; /* 100% of the viewport height */
+            margin: 0;
+        }
+
+        form {
+            width: 50%; /* Adjust the width as needed */
+            background-color: white; /* White color for the form background */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Light shadow effect */
+        }
+
+        label {
+            font-size: 16px;
+            color: white; /* White text color */
+            background-color: #ff9900; /* Light orange background */
+            padding: 8px 12px; /* Adjust the padding as needed */
+            border-radius: 5px; /* Rounded corners */
+            display: block; /* Display as block to move it to a new line */
+            margin-bottom: 20px; /* Add margin to create space between the label and the form */
+            font-weight: bold; /* Make the label text bold */
+        }
+
+        select {
+            width: 100%; /* Make the dropdown fill the container width */
+            padding: 10px; /* Add padding for better appearance */
+            margin-bottom: 20px; /* Add margin for spacing */
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #34a4b0; /* Blue-green button color */
+            color: white; /* White text on button */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <form id="Pointage">
+        {% csrf_token %}
+        <label for="month">Type:</label>
+        <select id="month" name="month">
+            <option value="0">Annual</option>
+            <option value="1">Janvier </option>
+            <option value="2">Fevrier </option>
+            <option value="3">Mars </option>
+            <option value="4">Avril </option>
+            <option value="5">Mai </option>
+            <option value="6">Juin </option>
+            <option value="7">Juillet </option>
+            <option value="8">Aout </option>
+            <option value="9">Septembre </option>
+            <option value="10">Octobre </option>
+            <option value="11">Novembre </option>
+            <option value="12">Decembre </option>
+        </select>
+        <label for="year">Year</label>
+        <select id="year" name="year">
+            {% for year in years %}
+            <option value="{{year}}" {% if forloop.last %}selected{% endif %}>{{year}}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Avancee</button>
+    </form>
+</body>
+<script> 
+ // Set the timeout duration in milliseconds (4 minutes)
+    const timeoutDuration = 240000;
+    
+    // Function to logout the user
+    function logoutUser() {
+    var urlScheme = window.location.protocol;
+
+    // Get the hostname
+    var hostname = window.location.hostname;
+
+    // Get the port (if specified)
+    var port = window.location.port;
+    // Remove session data from cookies
+    document.cookie = "sessionid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    // Redirect to logout page or perform other logout actions
+    var logoutUrl = urlScheme + '//' + hostname;
+    if (port) {
+        logoutUrl += ':' + port;
+    }
+    logoutUrl += '/logout/';
+    console.log(logoutUrl)
+    // Redirect to the logout URL
+    window.location.href = logoutUrl; // Redirect to logout page
+}
+    
+    // Function to start the countdown timer
+    function startTimer() {
+        // Set the timeout for logout
+        setTimeout(logoutUser, timeoutDuration);
+    }
+    
+    // Start the timer when the page is loaded or when the user performs an action
+    document.addEventListener('DOMContentLoaded', startTimer);
+    document.addEventListener('mousemove', startTimer); // Reset timer on mouse movement
+    document.addEventListener('keypress', startTimer); // Reset timer on keypress
+    
+    document.getElementById('Pointage').addEventListener('submit', function(event) {
+            event.preventDefault();  // Prevent the default form submission
+
+            // Get the selected month value
+            var month = document.getElementById('month').value;
+
+            // Construct the URL for the form submission
+            var url = "{% url 'affichage_mois_all' instance.id %}";
+
+            // Open a new tab and submit the form asynchronously
+            var form = document.getElementById('Pointage');
+            form.setAttribute('target', '_blank');
+            form.setAttribute('action', url);
+            form.setAttribute('method', 'post');
+            form.submit();
+
+            // Redirect the current tab back to the menu
+            window.location.href = "{% url 'table_employe' instance.id %}";
+        });
+    
+    </script>
+</html>
