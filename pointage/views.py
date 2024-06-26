@@ -261,11 +261,11 @@ def main_view(request,ID,year):
     # Save the workbook
     workbook.save(output_file)
     current_directory = os.getcwd()
-    file_name = "convert.sh"
+    file_name = "convert.bat"
     file_path = os.path.join(current_directory, file_name)
     output_folder=current_directory #os.path.join(current_directory,"temp/")
     pdf_name=os.path.join(current_directory,f"{request.user.username}{ID}.pdf")
-    excel_to_pdf(pdf_name,output_file,output_folder)
+    excel_to_pdf(file_path,output_file,output_folder)
     pdf_file= pdf_name#os.path.join(output_folder,pdf_name)
     response = FileResponse(open(pdf_file, 'rb'), content_type='application/pdf')
     response['Content-Disposition'] = 'inline'
@@ -545,11 +545,11 @@ def affichage_mois(request,ID):
     
     workbook.save(output_file)
     current_directory = os.getcwd()
-    file_name = "convert.sh"
+    file_name = "convert.bat"
     file_path = os.path.join(current_directory, file_name)
     output_folder=current_directory #os.path.join(current_directory,"temp/")
     pdf_name=os.path.join(current_directory,f"{request.user.username}{ID}_mois.pdf")
-    excel_to_pdf(pdf_name,output_file,output_folder)
+    excel_to_pdf(file_path,output_file,output_folder)
     
     pdf_file=pdf_name #os.path.join(output_folder,pdf_name)
     response = FileResponse(open(pdf_file, 'rb'), content_type='application/pdf')
@@ -669,11 +669,11 @@ def affichage_mois_all(request,ID):
     workbook.remove(workbook.active)    
     workbook.save(output_file)
     current_directory = os.getcwd()
-    file_name = "convert.sh"
+    file_name = "convert.bat"
     file_path = os.path.join(current_directory, file_name)
     output_folder=current_directory #os.path.join(current_directory,"temp/")
     pdf_name=os.path.join(current_directory,f"{request.user.username}{ID}_mois.pdf")
-    excel_to_pdf(pdf_name,output_file,output_folder)
+    excel_to_pdf(file_path,output_file,output_folder)
     
     pdf_file=pdf_name #os.path.join(output_folder,pdf_name)
     response = FileResponse(open(pdf_file, 'rb'), content_type='application/pdf')
@@ -1071,6 +1071,7 @@ def fiche_de_paie(validation_date , valid):
         sheet[f'B{i}'] = z.id
         sheet[f'E{i}'] = z.function
         z.actif=3
+        z.save()
         sheet.merge_cells(f'F{i}:AG{i}')
         sheet[f'F{i}']='STC'
     if valid:
@@ -1305,11 +1306,11 @@ def synthese(request,ID):
 
     workbook.save(output_file)
     current_directory = os.getcwd()
-    file_name = "convert.sh"
+    file_name = "convert.bat"
     file_path = os.path.join(current_directory, file_name)
     output_folder=current_directory #os.path.join(current_directory,"temp/")
     pdf_name=os.path.join(current_directory,f"{request.user.username}{ID}_synthese.pdf")
-    excel_to_pdf(pdf_name,output_file,output_folder)
+    excel_to_pdf(file_path,output_file,output_folder)
     
     pdf_file=pdf_name #os.path.join(output_folder,pdf_name)
     response = FileResponse(open(pdf_file, 'rb'), content_type='application/pdf')
