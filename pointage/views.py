@@ -688,7 +688,7 @@ def affichage_mois_all(request,ID):
     file_name = "convert.bat"
     file_path = os.path.join(current_directory, file_name)
     output_folder=current_directory #os.path.join(current_directory,"temp/")
-    pdf_name=os.path.join(current_directory,f"{request.user.username}{ID}_mois.pdf")
+    pdf_name=os.path.join(current_directory,f"{request.user.username}{ID}_unit_mois.pdf")
     excel_to_pdf(file_path,output_file,output_folder)
     
     pdf_file=pdf_name #os.path.join(output_folder,pdf_name)

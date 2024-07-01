@@ -195,7 +195,7 @@
     <a href="{% url 'pointage' id %}">
       <button class="btn btn-dark"><span>&#128336;</span> Pointage</button>
     </a>
-    {% if request.user.profile.da < 3 %}
+    {% if request.user.profile.da < 2 %}
       <a href="{% url 'add_employe' id %}">
         <button class="btn btn-warning"><span>&#128100;</span> Ajouter employe</button>
       </a>

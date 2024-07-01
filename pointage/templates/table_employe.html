@@ -199,13 +199,14 @@
                 <td>{{ instance.name }}</td>
                 <td>{{ instance.last_name }}</td>
                 <td class="actions">
-                    {% if da < 3 %}
+                    {% if da < 2 %}
                     <a href="{% url 'update_employe' instance.id %}" class="btn btn-info">Modifier</a>
                     {% endif %}
-                    <a href="{% url 'mission' instance.id %}" class="btn btn-primary">Mission</a>
+                    
                     <a href="{% url 'pointage_mois' instance.id %}" class="btn btn-primary">Pointage</a>
     
                     {% if da == 1 %}
+                    <a href="{% url 'mission' instance.id %}" class="btn btn-primary">Mission</a>
                     <a href="{% url 'synthese' instance.id %}" class="btn btn-primary" target="_blank">Fiche Synthese</a>
                     <a href="{% url 'remboursement' instance.id %}" class="btn btn-warning">remboursement</a>
     
