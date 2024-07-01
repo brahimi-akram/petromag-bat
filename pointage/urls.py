@@ -11,7 +11,6 @@ urlpatterns = [
     path('main/<int:ID>/<int:year>', views.main_view, name='main_view'),
     path('main_all/<int:ID>/<int:year>', views.main_view_all, name='main_view_all'),
     
-    
     path('remboursement/<int:ID>',views.remboursement_formule,name='remboursement'),
     path('table_employe/<int:ID>/', views.table_employe, name='table_employe'),
     path('update_employe/<int:ID>/', views.update_employe, name='update_employe'),

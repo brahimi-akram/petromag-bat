@@ -294,29 +294,29 @@
                                             <td> 
                                                 <select  id="{{ i.id }}_{{ date }}" name="{{ i.id }}_{{ date }}" {% if i in employe_to_disable %} disabled {% endif %}>
                                                     {% comment %} <option value="">-</option> {% endcomment %}
-                                                    <option value="{{ result.code.ID }}" selected>{{ result.code.ID }}</option>
+                                                    <option value="{{ result.code.id }}" selected>{{ result.code.id }}</option>
                                                     {% for code in codes %}
-                                                        <option value="{{ code.ID }}">{{ code.ID }}</option>
+                                                        <option value="{{ code.id }}">{{ code.id }}</option>
                                                     {% endfor %}
                                                 </select>
                                             </td>
                                     
                                     
-                                        {% elif result.code.ID != null  %}
+                                        {% elif result.code.id != null  %}
                                             {% if result.date == today %}
                                             <td> 
                                                 <select  id="{{ i.id }}_{{ date }}" name="{{ i.id }}_{{ date }}" class="specific-select"  disabled >
                                                 
-                                                    <option value="{{ result.code.ID }}" selected>{{ result.code.ID }}</option>
+                                                    <option value="{{ result.code.id }}" selected>{{ result.code.id }}</option>
                                                     {% for code in codes %}
-                                                        <option value="{{ code.ID }}">{{ code.ID }}</option>
+                                                        <option value="{{ code.id }}">{{ code.id }}</option>
                                                     {% endfor %}
                                                 </select>
         
                                             </td>
                                             
                                             {% else %}
-                                            <td> <div>{{ result.code.ID }}</div></td>
+                                            <td> <div>{{ result.code.id }}</div></td>
                                             {% endif %}
                                             
                                         {% else %}
@@ -324,7 +324,7 @@
                                                 <select id="{{ i.id }}_{{ date }}" name="{{ i.id }}_{{ date }}" {% if i in employe_to_disable %} disabled {% endif %} >
                                                         <option value="">-</option>
                                                         {% for code in codes %}
-                                                            <option value="{{ code.ID }}">{{ code.ID }}</option>
+                                                            <option value="{{ code.id }}">{{ code.id }}</option>
                                                         {% endfor %}
                                                 </select>
                                             </td>
@@ -348,29 +348,29 @@
                                             <td> 
                                                 <select  id="{{ i.id }}_{{ date }}" name="{{ i.id }}_{{ date }}">
                                                     {% comment %} <option value="">-</option> {% endcomment %}
-                                                    <option value="{{ result.code.ID }}" selected>{{ result.code.ID }}</option>
+                                                    <option value="{{ result.code.id }}" selected>{{ result.code.id }}</option>
                                                     {% for code in codes %}
-                                                        <option value="{{ code.ID }}">{{ code.ID }}</option>
+                                                        <option value="{{ code.id }}">{{ code.id }}</option>
                                                     {% endfor %}
                                                 </select>
                                             </td>
                                     
                                     
-                                        {% elif result.code.ID != null  %}
+                                        {% elif result.code.id != null  %}
                                             {% if result.date == today %}
                                             <td> 
                                                 <select  id="{{ i.id }}_{{ date }}" name="{{ i.id }}_{{ date }}" class="specific-select"  disabled >
                                                 
-                                                    <option value="{{ result.code.ID }}" selected>{{ result.code.ID }}</option>
+                                                    <option value="{{ result.code.id }}" selected>{{ result.code.id }}</option>
                                                     {% for code in codes %}
-                                                        <option value="{{ code.ID }}">{{ code.ID }}</option>
+                                                        <option value="{{ code.id }}">{{ code.id }}</option>
                                                     {% endfor %}
                                                 </select>
         
                                             </td>
                                             
                                             {% else %}
-                                            <td> <div>{{ result.code.ID }}</div></td>
+                                            <td> <div>{{ result.code.id }}</div></td>
                                             {% endif %}
                                             
                                         {% else %}
@@ -378,7 +378,7 @@
                                                 <select id="{{ i.id }}_{{ date }}" name="{{ i.id }}_{{ date }}">
                                                         <option value="">-</option>
                                                         {% for code in codes %}
-                                                            <option value="{{ code.ID }}">{{ code.ID }}</option>
+                                                            <option value="{{ code.id }}">{{ code.id }}</option>
                                                         {% endfor %}
                                                 </select>
                                             </td>
@@ -412,8 +412,8 @@
         </tr>
         {% for code in codes %}
         <tr>
-            <td>{{code.ID}}</td>
-            <td class="desc">{{code.Description}}</td>
+            <td>{{code.id}}</td>
+            <td class="desc">{{code.description}}</td>
         </tr>
         {% endfor %}
     </table>

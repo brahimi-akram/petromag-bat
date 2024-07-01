@@ -2,10 +2,50 @@
 from django.db import connection
 from .models import *
 from openpyxl import load_workbook
-from datetime import datetime 
+from datetime import date, datetime 
 import glob
 import os
 import subprocess
+def init_code_annual():
+    Code_Employe.objects.all().delete()
+    with connection.cursor() as cursor:
+        cursor.execute("DELETE FROM sqlite_sequence WHERE name='pointage_code_employe';")
+
+# Step 3: Vacuum the database to reclaim storage space
+    with connection.cursor() as cursor:
+        cursor.execute("VACUUM;")
+    current_dir = os.getcwd()
+    parent_dir=os.path.join(current_dir,"test")
+# Search for Excel files in the parent directory
+    excel_files = glob.glob(os.path.join(parent_dir, '*.xlsx'))
+    column=['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
+    rows=14
+    for file in excel_files:
+        workbook=load_workbook(file)
+        sheet_names = workbook.sheetnames
+    # Print the list of sheet names
+        for name in sheet_names:
+            worksheet=workbook[name]
+            emp=Employe.objects.get(pk=int(name))
+            for row in range(rows,26):
+                
+                month=row-13
+                year=2024
+                for col in column:
+                    try:
+                        code_emp=Code_Employe()
+                        code_emp.employe=emp
+                        day=column.index(col)+1
+                        code=Code.objects.get(pk=worksheet[f"{col}{row}"].value)
+                        code_emp.code=code
+                        code_emp.date=date(year,month,day)
+                        code_emp.save()
+                    except Exception as e:
+                        #print(col,row,emp.id,worksheet[f"{col}{row}"].value)
+                        
+                        pass
+
+
 def init_sheet():
     Employe.objects.all().delete()
     with connection.cursor() as cursor:
@@ -227,6 +267,7 @@ def excel_to_pdf(file_path,*args):
         return f"Error: {str(e)}"
     
 def date_handling(input):
+    
     if isinstance(input, datetime):
         output= input.date()  # Convert to date
     elif input:
@@ -235,6 +276,8 @@ def date_handling(input):
             output = datetime.strptime(str(input), '%m/%d/%Y').date()
         except ValueError:
             output= None  # Handle invalid date formats
+    else :
+        output=None
     return output
 
 
@@ -289,4 +332,104 @@ def create_log(profile,operation,table):
     new_log.table=table
     new_log.date=datetime.now()
     new_log.save()
+
+def init_employe_pcpaye():
+    data = {
+        "T": "Travail sur site",
+        "RS": "Recuperation systeme",
+        "FDS": "Fin de semaine avec salaire sans et panier",
+        "M": "Arret de travail pour maladie",
+        "6": "Conge special -evenement familiale- (naissance, mariage, deces,.....)",
+        "7": "Absence autorisee sans salaire et sans IZCV",
+        "8": "Absence non autorisee sans salaire et sans IZCV",
+        "9": "Mise a pied",
+        "C": "Conge paye (deduit du CP)",
+        "CSS": "Conge sans solde",
+        "7D": "Mise en disponibilite sans salaire et sans IZCV",
+        "R1": "Recuperation sans IZCV deduit du reliquat",
+        "JF": "Jour ferie avec salaire et sans panier",
+        "A": "Arret de travail pour accident de travail",
+        "RDC": "Rayer du contrat (deces, demission, ......)",
+        "MLD": "Maladie longue duree (declare a la CNAS)",
+        "V": "Delai de route",
+        "X": "Abattement code (6)",
+        "1": "Mission sans IZCV et sans reliquat",
+        "2": "Mission autre Zone",
+        "3": "Mission avec IZCV et reliquat (mission du nord vers le sud)",
+        "4": "Mission sans IZCV avec CR sans IZCV (declenche depuis le domicile pendent le CR)",
+        "5": "Mission avec IZCV et CR sans IZCV",
+        "MS": "Mission sans IZCV avec reliquat des FDS et Ferie",
+        "CR": "Congé de récupération",
+        "CP": "Congé payé",
+    }
+
+    # Create instances
+    for code_id, description in data.items():
+        code_instance, created = Code.objects.get_or_create(id=code_id, defaults={'description': description})
+        if created:
+            print(f"Created Code: {code_id} - {description}")
+        else:
+            print(f"Code already exists: {code_id}")
+
+    Employe.objects.all().delete()
+    with connection.cursor() as cursor:
+        cursor.execute("DELETE FROM sqlite_sequence WHERE name='pointage_employe';")
+
+# Step 3: Vacuum the database to reclaim storage space
+    with connection.cursor() as cursor:
+        cursor.execute("VACUUM;")
+
+    current_directory=os.getcwd()
+    pcpaye_directory=os.path.join(current_directory,'pcpaye')
+    
+    excel_files=glob.glob(os.path.join(pcpaye_directory,'*.xlsx'))
+    if excel_files:
+        for file in excel_files:
+            workbook=load_workbook(file)
+            sheet_names=workbook.sheetnames
+            for sheet_name in sheet_names:
+                row=11
+                worksheet=workbook[sheet_name]
+                while worksheet[f"B{row}"].value:
+                    employe,created=Employe.objects.get_or_create(pk=int(worksheet[f"B{row}"].value))
+                    if created:
+                        employe.name=worksheet[f"C{row}"].value
+                        employe.last_name=worksheet[f"D{row}"].value
+                        employe.date_of_birth=date_handling(worksheet[f"E{row}"].value)
+                        employe.place_of_birth=worksheet[f"F{row}"].value
+                        employe.adresse=worksheet[f"H{row}"].value
+                        employe.father_name=worksheet[f"I{row}"].value
+                        employe.mother_name=str(worksheet[f"J{row}"].value +" "+ worksheet[f"K{row}"].value)
+                        if worksheet[f"L{row}"].value == 'M':
+                            employe.familiy_situation=1
+                            employe.numbre_of_children=int(worksheet[f"M{row}"].value[2])
+                        else:
+                            employe.familiy_situation=0
+                        employe.recruitment_date=date_handling(worksheet[f"O{row}"].value)
+                        employe.cnas_number=int(worksheet[f"P{row}"].value)
+                        employe.phone=[int(worksheet[f"Q{row}"].value) if worksheet[f"Q{row}"].value else None][0]
+                        employe.function=worksheet[f"R{row}"].value
+                        full_account=int(worksheet[f"S{row}"].value)
+                        employe.account_key=int(full_account%100)
+                        full_account=int(full_account/100)
+                        employe.account_number=int(full_account%100000000)
+                        full_account=int(full_account/100000000)
+                        employe.account_agency=int(full_account%100000)
+                        employe.cni_number=[int(worksheet[f"T{row}"].value) if worksheet[f"T{row}"].value else None][0]
+                        employe.cni_established_date=date_handling(worksheet[f"U{row}"].value)
+                        employe.cni_established_by=worksheet[f"V{row}"].value
+                        if date_handling(worksheet[f"X{row}"].value):
+                            partner=Partner()
+                            partner.marriage_date=date_handling(worksheet[f"X{row}"].value)
+                            partner.name=worksheet[f"Y{row}"].value
+                            partner.id_employe=employe
+                        employe.unite_id=int(worksheet[f"AD{row}"].value)
+                        employe.exit_date=date_handling(worksheet[f"AC{row}"].value)
+                        if employe.exit_date is not None:
+                            employe.active=3
+                        else:
+                            print(employe.id,"is active")
+                        employe.save()
+                    row+=1
+        init_code_annual()        
         

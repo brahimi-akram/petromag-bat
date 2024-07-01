@@ -4,16 +4,16 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 
 
-class ValidDate(models.Model):
-    nom = models.CharField(max_length=30)
+class ValidDate(models.Model): #table== class
+    nom = models.CharField(max_length=30) #attribute ==
     date_of_validation= models.DateField()
     month = models.IntegerField(default=2)
 
 class Code(models.Model):
-    ID=models.CharField(primary_key=True,max_length=3)
-    Description=models.TextField()
+    id=models.CharField(primary_key=True,max_length=3)
+    description=models.TextField()
     def __str__(self) -> str:
-        return str(self.ID)
+        return str(self.id)
 
 class Month_stat(models.Model):
     period=models.CharField(max_length=6)
@@ -42,11 +42,11 @@ class Code_Employe(models.Model):
     @property
     def is_editable(self):
         today = timezone.now().date() 
-        if self.code.ID == "8" :
+        if self.id == "8" :
             diff = (today - self.date).days
             return diff <= 5  # Example: Editable if the difference is less than 7 days
         
-        return False  # Not editable if code.ID is not "8" 
+        return False  # Not editable if id is not "8" 
     
     
         
@@ -102,7 +102,7 @@ class Employe(models.Model):
     father_name=models.CharField(max_length=30,null=True)
     mother_name=models.CharField(max_length=30,null=True)
     phone=models.IntegerField(null=True)
-    familiy_situation=models.CharField(max_length=30,null=True)
+    familiy_situation=models.BooleanField(default=0)
     numbre_of_children=models.IntegerField(null=True)
     blood_type=models.CharField(max_length=5,null=True)
     cnas_number=models.IntegerField(null=True)
@@ -110,6 +110,7 @@ class Employe(models.Model):
     position=models.CharField(max_length=60,null=True)
     enterprise=models.CharField(max_length=60,null=True)
     recruitment_date=models.DateField(default=timezone.now,null=True)
+    exit_date=models.DateField(null=True)
     department=models.CharField(max_length=60,null=True)
     service=models.CharField(max_length=60,null=True)
     contract_number=models.CharField(max_length=40,null=True)
@@ -153,8 +154,8 @@ class Employe(models.Model):
         return f"{self.name} - {self.last_name}"
 
 class Partner(models.Model):
-    name=models.CharField(max_length=30)
-    last_name=models.CharField(max_length=30)
+    name=models.CharField(max_length=30,null=True)
+    last_name=models.CharField(max_length=30,null=True)
     date_of_birth=models.DateField(null=True)
     place_of_birth=models.CharField(max_length=30,null=True)
     wilaya_of_birth=models.CharField(max_length=30,null=True)

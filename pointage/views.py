@@ -2,6 +2,7 @@ import calendar
 from datetime import date, timedelta,datetime
 import os
 import shutil
+from urllib import request
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render,redirect
@@ -14,6 +15,7 @@ from django.contrib.auth import logout
 from .models import *
 from .utils import *
 from shutil import copyfile
+from django.contrib.admin.models import ADDITION, CHANGE, DELETION
 
 import time
 
@@ -35,14 +37,12 @@ def pointage2(request,ID):
         MI=['1',"2","3","4","5","MS"]
         Conge=['C','CSS']
         for i in all_employe:
-            ranges_and_values={}
             for date in date_range:
-                cell=find_cell(date)
                 choice=request.POST.get(f'{i.id}_{date}')
                 code=Code_Employe.objects.filter(employe=i,date=date)
                 if  choice == "" :
                     if code.exists():
-                                month_emp=Month_stat.objects.filter(Employe=i,period=f'{date.month}{date.year}')
+                                month_emp=Month_stat.objects.filter(employe=i,period=f'{date.month}{date.year}')
                                 if code.code_id in MI:
                                     month_emp.mission-=1
                                 elif code.code_id in "8":
@@ -96,7 +96,10 @@ def pointage2(request,ID):
                     code_emp.code=Code.objects.get(pk=choice)
                     
                     code_emp.save()
+                    
+                    log_action(request.user,ContentType.objects.get_for_model(Code_Employe),code_emp.id,str(code_emp),ADDITION,"to be saved")
                     create_log(request.user.username,"add",f"code employe {code_emp}")
+
             for emp in employe_on_mission:
                 valid=request.POST(f"{emp.id}_valid")
                 if valid:
@@ -239,8 +242,6 @@ def main_view(request,ID,year):
     new_cell_ref = f"{column}{new_row}'''#this code for keeping logs for the user that enterd to pointage annee (needs date)
     try:
         code_list=Code_Employe.objects.filter(employe_id=ID,date__year=year)
-        print(code_list)
-
         for code in code_list:
             base_row=ord('A')
             base_col=13
@@ -273,10 +274,14 @@ def main_view(request,ID,year):
     return response
 
 def login_view(request):
-    #init_code()
+    #init_employe_pcpaye()
+    #unit=Unite.objects.get(pk=1)
+    #sync(unit)
     if request.user.is_authenticated:
         return redirect("menu_view")
     if request.method == 'POST':
+        print(request)
+        print(request.POST)
         unitname = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, unitename=unitname, password=password)
@@ -303,8 +308,8 @@ def menu_view(request):
     id = request.user.profile.unite.id
     if request.user.profile.da == 1 and request.GET.get('unite'):
         id=request.GET.get('unite') 
-    stations = Unite.objects.all()
-    unite = Unite.objects.get(id=id)
+    stations = Unite.objects.all()  #select * from unite
+    unite = Unite.objects.get(id=id) #select * from unite where id==id
     yyyy = datetime.now().year
     mm = datetime.now().month
     if datetime.now().day < 16:
@@ -354,6 +359,7 @@ def menu_view(request):
                                 
                             code_emp.stored = True
                             code_emp.save()
+                            log_action(request.user,ContentType.objects.get_for_model(Code_Employe),code_emp.id,str(code_emp),ADDITION,"to be saved")
             except Code_Employe.DoesNotExist:
                     continue
     
@@ -376,23 +382,28 @@ def add_employe(request,ID):
             partnerform=partnerForm(request.POST,prefix='partner')
             if form.is_valid():
                 user=form.save()
+                log_action(request.user,ContentType.objects.get_for_model(Employe),user.id,str(user),ADDITION,"to be saved")
                 
                 if partnerform.is_valid():
                     partner=partnerform.save(commit=False)
                     partner.id_employe=user
-                    partner.save()
+                    if partner.name:
+                        partner.save()
+                        log_action(request.user,ContentType.objects.get_for_model(Partner),partner.id,str(partner),ADDITION,"to be saved")
                 if diplomes.is_valid():
                     for diplomeform in diplomes:
                         if diplomeform.cleaned_data:
                             diplome=diplomeform.save(commit=False)
                             diplome.id_employe=user
                             diplome.save()
+                            log_action(request.user,ContentType.objects.get_for_model(Diplome),diplome.id,str(diplome),ADDITION,"to be saved")
                 if children.is_valid():
                     for childform in children:
                         if childform.cleaned_data:
                             child=childform.save(commit=False)
                             child.id_employe=user
                             child.save()
+                            log_action(request.user,ContentType.objects.get_for_model(Child),child.id,str(child),ADDITION,"to be saved")
                 create_log(request.user.username,"add",f"employe {user}")
                 return redirect('table_employe',ID)
         else :
@@ -407,22 +418,27 @@ def add_employe(request,ID):
                 user=form.save()
                 user.unite=ID
                 user.save()
+                log_action(request.user,ContentType.objects.get_for_model(Employe),user.id,str(user),ADDITION,"to be saved")
                 if partnerform.is_valid():
                     partner=partnerform.save(commit=False)
                     partner.employe_id=user.id
-                    partner.save()
+                    if partner.name:
+                        partner.save()
+                        log_action(request.user,ContentType.objects.get_for_model(Partner),partner.id,str(partner),ADDITION,"to be saved")
                 if formset_diplomes.is_valid():
                     for diplomeform in diplomes:
                         if diplomeform.cleaned_data:
                             diplome=diplomeform.save(commit=False)
                             diplome.employe_id=user.id
                             diplome.save()
+                            log_action(request.user,ContentType.objects.get_for_model(Code_Employe),diplome.id,str(diplome),ADDITION,"to be saved")
                 if formset_child.is_valid():
                     for childform in children:
                         if childform.cleaned_data:
                             child=childform.save(commit=False)
                             child.employe_id=user.id
                             child.save()
+                            log_action(request.user,ContentType.objects.get_for_model(Code_Employe),child.id,str(child),ADDITION,"to be saved")
                 create_log(request.user.username,"add",f"employe {user}")
                 return redirect('table_employe',ID)
         else:
@@ -433,7 +449,7 @@ def add_employe(request,ID):
 def table_employe(request,ID):
     if request.user.profile.unite.id != ID  and (request.user.profile.da != 1) :
         return redirect("menu_view")
-    instances=Employe.objects.filter(unite=ID)
+    instances=Employe.objects.filter(unite=ID) #slecet * from employe where unite=ID
     return render(request,'table_employe.html',{'id':ID,'instances':instances,'da':request.user.profile.da})
 
 
@@ -1220,8 +1236,11 @@ def synthese(request,ID):
     sheet["B13"]=employe.father_name
     sheet["E13"]=employe.mother_name
     sheet["I13"]=employe.phone
-    sheet["B15"]=employe.familiy_situation
-    sheet["D15"]=employe.numbre_of_children
+    if employe.familiy_situation:
+        sheet["B15"]="Marié"
+        sheet["D15"]=employe.numbre_of_children
+    else :
+        sheet["B15"]="Célibataire"
     sheet["F15"]=employe.blood_type
     sheet["H15"]=employe.cnas_number
     sheet["B17"]=employe.function
@@ -1361,4 +1380,101 @@ def mission(request,ID):
         mission.save()
         create_log(request.user.username,"create",f"mission {mission}")
         return redirect(table_employe,employe.unite_id)
+    
+def serialize_instance(instance):
+    data = {}
+    for field in instance._meta.fields:
+        value = getattr(instance, field.name)
+        if isinstance(value, (datetime, date)):
+            value = value.isoformat()
+        elif isinstance(field, models.ForeignKey):
+            related_model = field.related_model
 
+            related_instance = getattr(instance, field.name)
+            if related_instance:
+                value = f"{related_model._meta.model_name}:{related_instance.id}"
+            else:
+                value = None
+        data[field.name] = value
+    return data
+
+from django.contrib.admin.models import LogEntry
+from django.apps import apps
+import requests
+def sync(unit):
+    if check_web_server():
+        print ('server is up')
+        try:
+            log_enteries=LogEntry.objects.filter(action_time__date__gt=unit.last_update)
+            instances_data=[]
+            for log in log_enteries:
+                model_class=log.content_type.model_class()
+                if model_class.__name__ != 'Profile' and log.action_flag==1:
+                    print(model_class,log.object_id)
+                    instance=model_class.objects.get(id=log.object_id)
+                    instance_data={
+                        "model":log.content_type.model,
+                        "instance_id":instance.id,
+                        "data": serialize_instance(instance)
+                    }
+                    instances_data.append(instance_data)
+            response=requests.post("http://127.0.0.1:9000/fetch/",json=instances_data)
+            if response.status_code==200:
+                response_data=response.json()
+                update=response_data['update']
+                for header,id in update.items():
+                    model,old_id=header.split('|')
+                    model_class=apps.get_model(app_label='pointage',model_name=model)
+                    old_instance=model_class.objects.get(pk=old_id)
+                    old_instance.id=id
+                    old_instance.save()
+                unit.last_update=datetime.now().date()
+                unit.save()
+                return 1
+            else:
+                return 0
+        except Exception as e:
+            print(e)
+            return -1
+    else:
+        print('server is down')
+        return -1    
+
+
+
+from django.contrib.admin.models import LogEntry
+from django.contrib.contenttypes.models import ContentType
+from django.utils import timezone
+
+def log_action(user, content_type, object_id, object_repr, action_flag, change_message=None):
+    """
+    Function to create a log entry in Django's admin_log table.
+    
+    Parameters:
+    - user: User instance who performed the action.
+    - content_type: ContentType instance of the affected object.
+    - object_id: ID of the affected object.
+    - object_repr: String representation of the affected object.
+    - action_flag: Action flag (ADDITION, CHANGE, DELETION).
+    - change_message: Optional message describing the change.
+    """
+    LogEntry.objects.log_action(
+        user_id=user.pk,
+        content_type_id=content_type.pk,
+        object_id=object_id,
+        object_repr=object_repr,
+        action_flag=action_flag,
+        change_message=change_message,
+    )
+
+def check_web_server():
+    url = 'http://127.0.0.1:9000/'
+
+    try:
+        response = requests.head(url)
+        if response.status_code == 200:
+            return 1
+        else:
+            return 0
+    except requests.ConnectionError:
+        return 0
